@@ -6,8 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="日事清">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon-192.png">
 <title>日事清 - 智能提醒助手</title>
-<!-- <link rel="manifest" href="manifest.json"> -->
+<link rel="manifest" href="manifest.json">
 <style>
 /* ==================== CSS Reset & Variables ==================== */
 :root {
@@ -997,6 +999,480 @@ body {
   flex-shrink: 0;
 }
 
+/* ==================== Custom Category Modal ==================== */
+.cat-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 700;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.cat-modal-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.cat-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  width: calc(100% - 48px);
+  max-width: 380px;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  z-index: 800;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.cat-modal.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.cat-modal-header {
+  padding: 20px 20px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cat-modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cat-modal-close {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--separator);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.cat-modal-body {
+  padding: 0 20px 20px;
+}
+
+.cat-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid var(--separator);
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-family: inherit;
+  outline: none;
+  background: var(--bg);
+  color: var(--text-primary);
+  transition: border-color 0.3s;
+  margin-bottom: 16px;
+}
+
+.cat-input:focus {
+  border-color: var(--accent);
+}
+
+.cat-section-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: block;
+}
+
+.cat-icon-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.cat-icon-option {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background: var(--bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: all 0.2s;
+}
+
+.cat-icon-option:active {
+  transform: scale(0.9);
+}
+
+.cat-icon-option.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+}
+
+.cat-color-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 6px;
+  margin-bottom: 20px;
+}
+
+.cat-color-option {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.cat-color-option:active {
+  transform: scale(0.9);
+}
+
+.cat-color-option.selected {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 4px var(--text-tertiary);
+}
+
+.cat-submit-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: linear-gradient(135deg, #007AFF, #5856D6);
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.cat-submit-btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.cat-submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Add category button in category select grid */
+.category-option.add-category {
+  border: 2px dashed var(--text-tertiary);
+  background: transparent;
+  opacity: 0.6;
+  transition: all 0.2s;
+}
+
+.category-option.add-category:active {
+  opacity: 1;
+  border-color: var(--accent);
+}
+
+.category-option.add-category .category-option-icon {
+  background: transparent;
+  font-size: 22px;
+  color: var(--text-tertiary);
+}
+
+/* Delete button on custom category options */
+.category-option {
+  position: relative;
+}
+
+.cat-delete-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 2px solid var(--card-bg);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.cat-delete-btn svg {
+  width: 8px;
+  height: 8px;
+  color: white;
+}
+
+.category-option.custom:active .cat-delete-btn,
+.category-option.custom .cat-delete-btn {
+  display: flex;
+}
+
+/* ==================== Notes Page ==================== */
+.notes-page {
+  display: none;
+  padding: 0 20px;
+  padding-bottom: calc(var(--tab-height) + 80px);
+}
+
+.notes-page.active {
+  display: block;
+}
+
+.note-compose {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.note-compose-area {
+  width: 100%;
+  min-height: 72px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: inherit;
+  resize: none;
+  line-height: 1.6;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.note-compose-area::placeholder {
+  color: var(--text-tertiary);
+}
+
+.note-compose-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--separator);
+}
+
+.note-compose-date {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-compose-date svg {
+  width: 14px;
+  height: 14px;
+}
+
+.note-send-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: none;
+  background: linear-gradient(135deg, #007AFF, #5856D6);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.note-send-btn:active {
+  transform: scale(0.95);
+  opacity: 0.9;
+}
+
+.note-send-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Note tag selector */
+.note-tag-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.note-tag-btn {
+  padding: 4px 12px;
+  border-radius: 14px;
+  border: 1.5px solid var(--separator);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.note-tag-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.note-tag-btn:active {
+  transform: scale(0.95);
+}
+
+/* Note cards */
+.note-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-card {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  animation: cardSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.note-card-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.note-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--separator);
+}
+
+.note-card-date {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.note-card-date svg {
+  width: 13px;
+  height: 13px;
+}
+
+.note-card-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: var(--accent-light);
+  color: var(--accent);
+}
+
+.note-card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.note-card-action {
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  transition: all 0.2s;
+  opacity: 0;
+}
+
+.note-card:hover .note-card-action,
+.note-card:active .note-card-action {
+  opacity: 1;
+}
+
+.note-card-action:hover {
+  background: var(--separator);
+  color: var(--red);
+}
+
+/* Note search results section */
+.search-results-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.search-results-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--separator);
+}
+
+.note-search-results {
+  padding: 0 20px;
+}
+
+/* Notes empty state */
+.notes-empty {
+  text-align: center;
+  padding: 60px 40px;
+}
+
+.notes-empty-icon {
+  font-size: 56px;
+  margin-bottom: 16px;
+}
+
+.notes-empty h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.notes-empty p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Note tag filter in search results */
+.note-tag-health { background: var(--orange-light); color: var(--orange); }
+.note-tag-life { background: var(--green-light); color: var(--green); }
+.note-tag-work { background: var(--accent-light); color: var(--accent); }
+.note-tag-mood { background: var(--pink-light); color: var(--pink); }
+.note-tag-other { background: var(--separator); color: var(--text-secondary); }
+
 /* ==================== Utility ==================== */
 .highlight-text {
   background: rgba(255, 204, 0, 0.3);
@@ -1036,7 +1512,7 @@ body {
   <div class="search-container">
     <div class="search-bar">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="搜索事件..." autocomplete="off">
+      <input type="text" id="searchInput" placeholder="搜索事件和笔记..." autocomplete="off">
       <button class="search-clear" id="searchClear">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -1052,6 +1528,24 @@ body {
   <!-- Stats Page -->
   <div class="stats-page" id="statsPage"></div>
 
+  <!-- Notes Page -->
+  <div class="notes-page" id="notesPage">
+    <!-- Compose Area -->
+    <div class="note-compose">
+      <textarea class="note-compose-area" id="noteInput" placeholder="记录一下...&#10;比如：今天戴了OK镜，感觉还不错，清晰度挺好的"></textarea>
+      <div class="note-tag-row" id="noteTagRow"></div>
+      <div class="note-compose-footer">
+        <div class="note-compose-date">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="noteComposeDate"></span>
+        </div>
+        <button class="note-send-btn" id="noteSendBtn">记录</button>
+      </div>
+    </div>
+    <!-- Note List -->
+    <div class="note-list" id="noteList"></div>
+  </div>
+
   <!-- FAB -->
   <button class="fab" id="fabBtn">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -1062,6 +1556,10 @@ body {
     <button class="tab-item active" data-tab="home">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>首页</span>
+    </button>
+    <button class="tab-item" data-tab="notes">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      <span>笔记</span>
     </button>
     <button class="tab-item" data-tab="stats">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -1133,18 +1631,113 @@ body {
   <span class="toast-text"></span>
 </div>
 
+<!-- Custom Category Modal -->
+<div class="cat-modal-overlay" id="catModalOverlay"></div>
+<div class="cat-modal" id="catModal">
+  <div class="cat-modal-header">
+    <h3>新建分类</h3>
+    <button class="cat-modal-close" id="catModalClose">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="cat-modal-body">
+    <input type="text" class="cat-input" id="catNameInput" placeholder="输入分类名称" maxlength="6">
+    <span class="cat-section-label">选择图标</span>
+    <div class="cat-icon-grid" id="catIconGrid"></div>
+    <span class="cat-section-label">选择颜色</span>
+    <div class="cat-color-grid" id="catColorGrid"></div>
+    <button class="cat-submit-btn" id="catSubmitBtn">添加分类</button>
+  </div>
+</div>
+
 <script>
 // ==================== Data & State ====================
-const CATEGORIES = [
-  { name: '全部', icon: '📋', color: '--accent' },
-  { name: '工作', icon: '💼', color: '--accent' },
-  { name: '生活', icon: '🏠', color: '--green' },
-  { name: '学习', icon: '📚', color: '--purple' },
-  { name: '健康', icon: '💪', color: '--orange' },
-  { name: '社交', icon: '👥', color: '--pink' },
-  { name: '财务', icon: '💰', color: '--teal' },
-  { name: '其他', icon: '📌', color: '--text-tertiary' }
+const DEFAULT_CATEGORIES = [
+  { name: '全部', icon: '📋', color: '--accent', isDefault: true },
+  { name: '工作', icon: '💼', color: '--accent', isDefault: true },
+  { name: '生活', icon: '🏠', color: '--green', isDefault: true },
+  { name: '学习', icon: '📚', color: '--purple', isDefault: true },
+  { name: '健康', icon: '💪', color: '--orange', isDefault: true },
+  { name: '社交', icon: '👥', color: '--pink', isDefault: true },
+  { name: '财务', icon: '💰', color: '--teal', isDefault: true },
+  { name: '其他', icon: '📌', color: '--text-tertiary', isDefault: true }
 ];
+
+const CUSTOM_CAT_ICONS = [
+  '🎯','🎨','🎵','🎬','✈️','🍕','🐱','🌟',
+  '🏋️','📷','🎮','🛒','🔧','📞','🎁','🌱',
+  '🚗','💊','🏫','🎤','📊','🔬','🎪','🧩',
+  '🏠','⚽','🍳','🧳','💡','📮','🎓','🗂️'
+];
+
+const CUSTOM_CAT_COLORS = [
+  { name: 'blue', value: '#007AFF', light: 'rgba(0,122,255,0.12)' },
+  { name: 'green', value: '#34C759', light: 'rgba(52,199,89,0.12)' },
+  { name: 'orange', value: '#FF9500', light: 'rgba(255,149,0,0.12)' },
+  { name: 'red', value: '#FF3B30', light: 'rgba(255,59,48,0.12)' },
+  { name: 'purple', value: '#AF52DE', light: 'rgba(175,82,222,0.12)' },
+  { name: 'pink', value: '#FF2D55', light: 'rgba(255,45,85,0.12)' },
+  { name: 'teal', value: '#5AC8FA', light: 'rgba(90,200,250,0.12)' },
+  { name: 'yellow', value: '#FFCC00', light: 'rgba(255,204,0,0.12)' },
+  { name: 'indigo', value: '#5856D6', light: 'rgba(88,86,214,0.12)' },
+  { name: 'brown', value: '#A2845E', light: 'rgba(162,132,94,0.12)' },
+  { name: 'mint', value: '#00C7BE', light: 'rgba(0,199,190,0.12)' },
+  { name: 'gray', value: '#8E8E93', light: 'rgba(142,142,147,0.12)' }
+];
+
+// Load custom categories from localStorage
+function loadCustomCategories() {
+  try {
+    const raw = localStorage.getItem('customCategories');
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCustomCategories(cats) {
+  localStorage.setItem('customCategories', JSON.stringify(cats));
+}
+
+function getCategories() {
+  const custom = loadCustomCategories();
+  // Insert custom categories before "其他"
+  const result = [...DEFAULT_CATEGORIES];
+  const otherIndex = result.findIndex(c => c.name === '其他');
+  result.splice(otherIndex, 0, ...custom.map(c => ({
+    name: c.name,
+    icon: c.icon,
+    color: 'custom',
+    customColor: c.color,
+    customColorLight: c.colorLight,
+    isDefault: false
+  })));
+  return result;
+}
+
+// Inject dynamic CSS for custom categories
+function injectCustomCategoryStyles() {
+  let styleEl = document.getElementById('customCatStyles');
+  if (!styleEl) {
+    styleEl = document.createElement('style');
+    styleEl.id = 'customCatStyles';
+    document.head.appendChild(styleEl);
+  }
+  
+  const custom = loadCustomCategories();
+  let css = '';
+  
+  custom.forEach(cat => {
+    const sel = CSS.escape(cat.name);
+    css += `
+      .event-card[data-category="${sel}"]::before { background: ${cat.color}; }
+      .event-card[data-category="${sel}"] .card-icon { background: ${cat.colorLight}; }
+      .event-card[data-category="${sel}"] .card-tag { background: ${cat.colorLight}; color: ${cat.color}; }
+    `;
+  });
+  
+  styleEl.textContent = css;
+}
 
 const CATEGORY_KEYWORDS = {
   '工作': ['会议','开会','周会','汇报','报告','项目','方案','文档','上班','加班','出差','客户','合同','面试','培训','演示','PPT','需求','排期','工作','邮件','对接','deadline','上线','发布','review','复盘','述职','OKR','KPI'],
@@ -1157,6 +1750,7 @@ const CATEGORY_KEYWORDS = {
 
 let state = {
   events: [],
+  notes: [],
   currentCategory: '全部',
   currentTab: 'home',
   searchQuery: '',
@@ -1176,6 +1770,28 @@ function loadEvents() {
 
 function saveEvents() {
   localStorage.setItem('dailyEvents', JSON.stringify(state.events));
+}
+
+// ==================== Notes Storage ====================
+const NOTE_TAGS = [
+  { name: '日常', cssClass: 'note-tag-life' },
+  { name: '健康', cssClass: 'note-tag-health' },
+  { name: '心情', cssClass: 'note-tag-mood' },
+  { name: '工作', cssClass: 'note-tag-work' },
+  { name: '其他', cssClass: 'note-tag-other' }
+];
+
+function loadNotes() {
+  try {
+    const raw = localStorage.getItem('dailyNotes');
+    state.notes = raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    state.notes = [];
+  }
+}
+
+function saveNotes() {
+  localStorage.setItem('dailyNotes', JSON.stringify(state.notes));
 }
 
 // ==================== Date Helpers ====================
@@ -1444,7 +2060,7 @@ function scheduleNotification(event) {
 function sendNotification(event, timing) {
   if (Notification.permission !== 'granted') return;
   
-  const catInfo = CATEGORIES.find(c => c.name === event.category);
+  const catInfo = getCategories().find(c => c.name === event.category);
   const icon = catInfo ? catInfo.icon : '📌';
   
   const notification = new Notification(`${icon} ${event.title}`, {
@@ -1483,6 +2099,7 @@ function renderHeader() {
 
 function renderCategoryTabs() {
   const container = document.getElementById('categoryTabs');
+  const CATEGORIES = getCategories();
   const counts = {};
   
   CATEGORIES.forEach(c => counts[c.name] = 0);
@@ -1562,7 +2179,7 @@ function renderEventList() {
   for (const [group, items] of Object.entries(groups)) {
     html += `<div class="section-title">${group}</div>`;
     items.forEach(event => {
-      const catInfo = CATEGORIES.find(c => c.name === event.category);
+      const catInfo = getCategories().find(c => c.name === event.category);
       const title = state.searchQuery ? 
         highlightText(event.title, state.searchQuery) : event.title;
       
@@ -1613,25 +2230,45 @@ function highlightText(text, query) {
 
 function renderCategorySelect() {
   const container = document.getElementById('categorySelect');
+  const CATEGORIES = getCategories();
   const cats = CATEGORIES.filter(c => c.name !== '全部');
   
-  container.innerHTML = cats.map(cat => `
-    <div class="category-option" data-cat="${cat.name}">
-      <div class="category-option-icon" style="background: var(${cat.color}-light, var(--separator))">${cat.icon}</div>
-      <span>${cat.name}</span>
+  container.innerHTML = cats.map(cat => {
+    const bgStyle = cat.color === 'custom' 
+      ? `background: ${cat.customColorLight}` 
+      : `background: var(${cat.color}-light, var(--separator))`;
+    const isCustom = !cat.isDefault;
+    return `
+      <div class="category-option ${isCustom ? 'custom' : ''}" data-cat="${cat.name}">
+        ${isCustom ? `<button class="cat-delete-btn" onclick="event.stopPropagation(); deleteCustomCategory('${cat.name}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>` : ''}
+        <div class="category-option-icon" style="${bgStyle}">${cat.icon}</div>
+        <span>${cat.name}</span>
+      </div>
+    `;
+  }).join('') + `
+    <div class="category-option add-category" id="addCategoryBtn">
+      <div class="category-option-icon">+</div>
+      <span>自定义</span>
     </div>
-  `).join('');
+  `;
   
-  container.querySelectorAll('.category-option').forEach(opt => {
+  // Category selection click
+  container.querySelectorAll('.category-option:not(.add-category)').forEach(opt => {
     opt.addEventListener('click', () => {
       container.querySelectorAll('.category-option').forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
     });
   });
+  
+  // Add category button
+  document.getElementById('addCategoryBtn').addEventListener('click', openCatModal);
 }
 
 function renderStatsPage() {
   const container = document.getElementById('statsPage');
+  const CATEGORIES = getCategories();
   const total = state.events.length;
   const completed = state.events.filter(e => e.completed).length;
   const pending = total - completed;
@@ -1649,10 +2286,16 @@ function renderStatsPage() {
   
   const maxCount = Math.max(...Object.values(catCounts), 1);
   
-  const colorMap = {
+  const defaultColorMap = {
     '工作': 'var(--accent)', '生活': 'var(--green)', '学习': 'var(--purple)',
     '健康': 'var(--orange)', '社交': 'var(--pink)', '财务': 'var(--teal)', '其他': 'var(--text-tertiary)'
   };
+  
+  // Build color map including custom categories
+  const colorMap = { ...defaultColorMap };
+  loadCustomCategories().forEach(c => {
+    colorMap[c.name] = c.color;
+  });
   
   container.innerHTML = `
     <div class="stats-grid">
@@ -1840,27 +2483,405 @@ function switchTab(tab) {
   
   const eventList = document.getElementById('eventList');
   const statsPage = document.getElementById('statsPage');
+  const notesPage = document.getElementById('notesPage');
   const searchContainer = document.querySelector('.search-container');
   const categoryTabs = document.getElementById('categoryTabs');
+  const fabBtn = document.getElementById('fabBtn');
+  
+  // Hide all first
+  eventList.style.display = 'none';
+  statsPage.classList.remove('active');
+  notesPage.classList.remove('active');
+  searchContainer.style.display = 'none';
+  categoryTabs.style.display = 'none';
+  fabBtn.style.display = 'none';
+  
+  // Remove note search results when switching
+  const noteSearchRes = document.getElementById('noteSearchResults');
+  if (noteSearchRes) noteSearchRes.remove();
   
   if (tab === 'home') {
     eventList.style.display = '';
-    statsPage.classList.remove('active');
     searchContainer.style.display = '';
     categoryTabs.style.display = '';
+    fabBtn.style.display = '';
     renderEventList();
+    // If there's a search query, also show note results
+    if (state.searchQuery) {
+      renderNoteSearchResults(state.searchQuery);
+    }
+  } else if (tab === 'notes') {
+    notesPage.classList.add('active');
+    searchContainer.style.display = '';
+    document.getElementById('noteComposeDate').textContent = getNoteDate();
+    renderNoteTagRow();
+    renderNoteList(state.searchQuery);
   } else if (tab === 'stats') {
-    eventList.style.display = 'none';
     statsPage.classList.add('active');
-    searchContainer.style.display = 'none';
-    categoryTabs.style.display = 'none';
     renderStatsPage();
   }
+}
+
+// ==================== Notes Functions ====================
+function getNoteDate() {
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const day = now.getDate();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  return `${month}月${day}日 ${h}:${m}`;
+}
+
+function formatNoteDate(isoStr) {
+  const d = new Date(isoStr);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const noteDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diff = (today - noteDay) / (1000 * 60 * 60 * 24);
+  
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const timeStr = `${h}:${m}`;
+  
+  if (diff === 0) return `今天 ${timeStr}`;
+  if (diff === 1) return `昨天 ${timeStr}`;
+  if (diff === 2) return `前天 ${timeStr}`;
+  
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  if (d.getFullYear() === now.getFullYear()) {
+    return `${month}月${day}日 ${timeStr}`;
+  }
+  return `${d.getFullYear()}年${month}月${day}日 ${timeStr}`;
+}
+
+function renderNoteTagRow() {
+  const container = document.getElementById('noteTagRow');
+  container.innerHTML = NOTE_TAGS.map((t, i) => `
+    <button class="note-tag-btn ${i === 0 ? 'selected' : ''}" data-tag="${t.name}">${t.name}</button>
+  `).join('');
+  
+  container.querySelectorAll('.note-tag-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.note-tag-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    });
+  });
+}
+
+function renderNoteList(searchQuery) {
+  const container = document.getElementById('noteList');
+  let notes = [...state.notes];
+  
+  // Filter by search
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    notes = notes.filter(n => 
+      n.content.toLowerCase().includes(q) ||
+      n.tag.toLowerCase().includes(q)
+    );
+  }
+  
+  // Sort by newest first
+  notes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  if (notes.length === 0) {
+    container.innerHTML = `
+      <div class="notes-empty">
+        <div class="notes-empty-icon">${searchQuery ? '🔍' : '📝'}</div>
+        <h3>${searchQuery ? '未找到相关笔记' : '还没有笔记'}</h3>
+        <p>${searchQuery ? '试试其他关键词' : '在上方输入框记录你的日常感受吧'}</p>
+      </div>
+    `;
+    return;
+  }
+  
+  // Group by date
+  const groups = {};
+  notes.forEach(n => {
+    const d = new Date(n.createdAt);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(n);
+  });
+  
+  let html = '';
+  let cardIndex = 0;
+  
+  for (const [dateKey, items] of Object.entries(groups)) {
+    const d = new Date(dateKey + 'T00:00:00');
+    const label = formatDate(dateKey);
+    html += `<div class="section-title">${label}</div>`;
+    
+    items.forEach(note => {
+      const tagInfo = NOTE_TAGS.find(t => t.name === note.tag) || NOTE_TAGS[4];
+      const content = searchQuery ? highlightText(note.content, searchQuery) : escapeHtml(note.content);
+      
+      html += `
+        <div class="note-card" data-note-id="${note.id}" style="animation-delay: ${cardIndex * 0.05}s">
+          <div class="note-card-content">${content}</div>
+          <div class="note-card-footer">
+            <div class="note-card-date">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              ${formatNoteDate(note.createdAt)}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="note-card-tag ${tagInfo.cssClass}">${note.tag}</span>
+              <button class="note-card-action" onclick="deleteNote('${note.id}')" title="删除">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      cardIndex++;
+    });
+  }
+  
+  container.innerHTML = html;
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function addNote() {
+  const input = document.getElementById('noteInput');
+  const content = input.value.trim();
+  if (!content) {
+    showToast('⚠️', '请输入笔记内容');
+    return;
+  }
+  
+  const selectedTag = document.querySelector('.note-tag-btn.selected');
+  const tag = selectedTag ? selectedTag.dataset.tag : '日常';
+  
+  const note = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    content: content,
+    tag: tag,
+    createdAt: new Date().toISOString()
+  };
+  
+  state.notes.push(note);
+  saveNotes();
+  
+  input.value = '';
+  renderNoteList();
+  showToast('✅', '笔记已记录');
+}
+
+function deleteNote(id) {
+  const card = document.querySelector(`.note-card[data-note-id="${id}"]`);
+  if (card) {
+    card.style.transition = 'transform 0.3s, opacity 0.3s';
+    card.style.transform = 'translateX(100%) scale(0.9)';
+    card.style.opacity = '0';
+    setTimeout(() => {
+      state.notes = state.notes.filter(n => n.id !== id);
+      saveNotes();
+      renderNoteList();
+      showToast('🗑️', '笔记已删除');
+    }, 300);
+  } else {
+    state.notes = state.notes.filter(n => n.id !== id);
+    saveNotes();
+    renderNoteList();
+  }
+}
+
+// Search notes and render results on the home page
+function renderNoteSearchResults(query) {
+  // Remove existing note search results container if any
+  let existing = document.getElementById('noteSearchResults');
+  if (existing) existing.remove();
+  
+  if (!query) return;
+  
+  const q = query.toLowerCase();
+  const matchedNotes = state.notes.filter(n => 
+    n.content.toLowerCase().includes(q) ||
+    n.tag.toLowerCase().includes(q)
+  );
+  
+  if (matchedNotes.length === 0) return;
+  
+  // Sort by newest
+  matchedNotes.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  // Show max 5 results
+  const showNotes = matchedNotes.slice(0, 5);
+  
+  let html = `<div id="noteSearchResults" class="note-search-results">`;
+  html += `<div class="search-results-divider">笔记中的匹配 (${matchedNotes.length}条)</div>`;
+  
+  showNotes.forEach(note => {
+    const tagInfo = NOTE_TAGS.find(t => t.name === note.tag) || NOTE_TAGS[4];
+    const content = highlightText(escapeHtml(note.content), query);
+    
+    html += `
+      <div class="note-card" data-note-id="${note.id}" style="margin-bottom:12px;">
+        <div class="note-card-content">${content}</div>
+        <div class="note-card-footer">
+          <div class="note-card-date">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            ${formatNoteDate(note.createdAt)}
+          </div>
+          <span class="note-card-tag ${tagInfo.cssClass}">${note.tag}</span>
+        </div>
+      </div>
+    `;
+  });
+  
+  if (matchedNotes.length > 5) {
+    html += `<div style="text-align:center;padding:8px;font-size:13px;color:var(--text-secondary);">
+      还有 ${matchedNotes.length - 5} 条匹配笔记，去「笔记」页查看全部
+    </div>`;
+  }
+  
+  html += `</div>`;
+  
+  // Append after event list
+  const eventList = document.getElementById('eventList');
+  eventList.insertAdjacentHTML('afterend', html);
+}
+
+// ==================== Custom Category Modal ====================
+let selectedCatIcon = null;
+let selectedCatColor = null;
+
+function openCatModal() {
+  selectedCatIcon = null;
+  selectedCatColor = null;
+  document.getElementById('catNameInput').value = '';
+  
+  // Render icon grid
+  const iconGrid = document.getElementById('catIconGrid');
+  iconGrid.innerHTML = CUSTOM_CAT_ICONS.map(icon => `
+    <button class="cat-icon-option" data-icon="${icon}">${icon}</button>
+  `).join('');
+  
+  iconGrid.querySelectorAll('.cat-icon-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      iconGrid.querySelectorAll('.cat-icon-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCatIcon = btn.dataset.icon;
+    });
+  });
+  
+  // Render color grid
+  const colorGrid = document.getElementById('catColorGrid');
+  colorGrid.innerHTML = CUSTOM_CAT_COLORS.map(c => `
+    <button class="cat-color-option" data-color="${c.value}" data-light="${c.light}" style="background: ${c.value}"></button>
+  `).join('');
+  
+  colorGrid.querySelectorAll('.cat-color-option').forEach(btn => {
+    btn.addEventListener('click', () => {
+      colorGrid.querySelectorAll('.cat-color-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedCatColor = { value: btn.dataset.color, light: btn.dataset.light };
+    });
+  });
+  
+  document.getElementById('catModalOverlay').classList.add('visible');
+  document.getElementById('catModal').classList.add('visible');
+  
+  setTimeout(() => document.getElementById('catNameInput').focus(), 300);
+}
+
+function closeCatModal() {
+  document.getElementById('catModalOverlay').classList.remove('visible');
+  document.getElementById('catModal').classList.remove('visible');
+}
+
+function submitCustomCategory() {
+  const name = document.getElementById('catNameInput').value.trim();
+  
+  if (!name) {
+    showToast('⚠️', '请输入分类名称');
+    return;
+  }
+  
+  if (name.length > 6) {
+    showToast('⚠️', '分类名称最多6个字');
+    return;
+  }
+  
+  // Check duplicate
+  const allCats = getCategories();
+  if (allCats.some(c => c.name === name)) {
+    showToast('⚠️', '分类名称已存在');
+    return;
+  }
+  
+  if (!selectedCatIcon) {
+    showToast('⚠️', '请选择一个图标');
+    return;
+  }
+  
+  if (!selectedCatColor) {
+    showToast('⚠️', '请选择一个颜色');
+    return;
+  }
+  
+  const custom = loadCustomCategories();
+  custom.push({
+    name: name,
+    icon: selectedCatIcon,
+    color: selectedCatColor.value,
+    colorLight: selectedCatColor.light
+  });
+  saveCustomCategories(custom);
+  injectCustomCategoryStyles();
+  
+  closeCatModal();
+  renderCategoryTabs();
+  renderCategorySelect();
+  renderStatsPage();
+  
+  // Auto-select the new category in the add-event form
+  setTimeout(() => {
+    const opt = document.querySelector(`.category-option[data-cat="${name}"]`);
+    if (opt) {
+      document.querySelectorAll('.category-option').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    }
+  }, 100);
+  
+  showToast('✅', `分类「${name}」已添加`);
+}
+
+function deleteCustomCategory(name) {
+  // Check if there are events using this category
+  const eventsUsingCat = state.events.filter(e => e.category === name);
+  
+  if (eventsUsingCat.length > 0) {
+    // Move events to "其他" category
+    eventsUsingCat.forEach(e => e.category = '其他');
+    saveEvents();
+    showToast('📌', `${eventsUsingCat.length}个事件已移至「其他」`);
+  }
+  
+  let custom = loadCustomCategories();
+  custom = custom.filter(c => c.name !== name);
+  saveCustomCategories(custom);
+  injectCustomCategoryStyles();
+  
+  renderCategoryTabs();
+  renderCategorySelect();
+  renderEventList();
+  renderStatsPage();
+  
+  showToast('🗑️', `分类「${name}」已删除`);
 }
 
 // ==================== Init & Events ====================
 function init() {
   loadEvents();
+  loadNotes();
+  injectCustomCategoryStyles();
   renderHeader();
   renderCategoryTabs();
   renderCategorySelect();
@@ -1879,6 +2900,11 @@ function init() {
   // Modal
   document.getElementById('modalOverlay').addEventListener('click', closeModal);
   document.getElementById('modalClose').addEventListener('click', closeModal);
+  
+  // Custom Category Modal
+  document.getElementById('catModalOverlay').addEventListener('click', closeCatModal);
+  document.getElementById('catModalClose').addEventListener('click', closeCatModal);
+  document.getElementById('catSubmitBtn').addEventListener('click', submitCustomCategory);
   
   // Notification button
   document.getElementById('btnNotification').addEventListener('click', async () => {
@@ -1963,15 +2989,39 @@ function init() {
   searchInput.addEventListener('input', (e) => {
     state.searchQuery = e.target.value;
     searchClear.classList.toggle('visible', !!state.searchQuery);
-    renderEventList();
+    
+    if (state.currentTab === 'home') {
+      renderEventList();
+      // Also show matching notes in home tab
+      renderNoteSearchResults(state.searchQuery);
+    } else if (state.currentTab === 'notes') {
+      renderNoteList(state.searchQuery);
+    }
   });
   
   searchClear.addEventListener('click', () => {
     searchInput.value = '';
     state.searchQuery = '';
     searchClear.classList.remove('visible');
-    renderEventList();
+    
+    if (state.currentTab === 'home') {
+      renderEventList();
+      renderNoteSearchResults('');
+    } else if (state.currentTab === 'notes') {
+      renderNoteList('');
+    }
     searchInput.focus();
+  });
+  
+  // Notes: send button
+  document.getElementById('noteSendBtn').addEventListener('click', addNote);
+  
+  // Notes: Enter to submit (Shift+Enter for new line)
+  document.getElementById('noteInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      addNote();
+    }
   });
   
   // Tab bar
@@ -2002,6 +3052,11 @@ function init() {
 
 // Start
 document.addEventListener('DOMContentLoaded', init);
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
