@@ -1,0 +1,17 @@
+{
+  "name": "日事清 - 智能提醒助手",
+  "short_name": "日事清",
+  "description": "智能事件管理与提醒应用，支持自然语言输入",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#F2F2F7",
+  "theme_color": "#007AFF",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23007AFF'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>📋</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

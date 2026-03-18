@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="日事清">
+<title>日事清 - 安装指南</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+  background: #F2F2F7;
+  min-height: 100vh;
+  color: #1C1C1E;
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+  padding: 60px 24px 36px;
+  text-align: center;
+  color: white;
+  position: relative;
+}
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: #F2F2F7;
+  border-radius: 24px 24px 0 0;
+}
+.app-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  background: white;
+  margin: 0 auto 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  position: relative;
+}
+.app-icon-wrap canvas { border-radius: 22px; }
+.header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.header .subtitle {
+  font-size: 15px;
+  opacity: 0.85;
+  margin-top: 4px;
+}
+
+/* Content */
+.content {
+  padding: 4px 20px 40px;
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* Alert Banner */
+.alert-banner {
+  background: #FFF3CD;
+  border: 1px solid #FFE69C;
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: none;
+}
+.alert-banner.error {
+  background: #FFE5E5;
+  border-color: #FFB3B3;
+}
+.alert-banner.success {
+  background: #D4EDDA;
+  border-color: #B1DFBB;
+}
+.alert-banner .alert-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.alert-banner .alert-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Status Card */
+.status-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+}
+.status-item:not(:last-child) {
+  border-bottom: 0.5px solid #E5E5EA;
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+}
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.status-dot.green { background: #34C759; }
+.status-dot.yellow { background: #FF9500; }
+.status-dot.red { background: #FF3B30; }
+.status-label {
+  font-size: 14px;
+  flex: 1;
+}
+.status-value {
+  font-size: 13px;
+  color: #8E8E93;
+  text-align: right;
+}
+
+/* Section Card */
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.card-badge.blue { background: #007AFF; }
+.card-badge.green { background: #34C759; }
+.card-badge.orange { background: #FF9500; }
+.card-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+/* Steps */
+.step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.step:last-of-type { margin-bottom: 0; }
+.step::before {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 32px;
+  bottom: -16px;
+  width: 1.5px;
+  background: #E5E5EA;
+}
+.step:last-of-type::before { display: none; }
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #007AFF;
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.step-body h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.step-body p {
+  font-size: 13px;
+  color: #8E8E93;
+  line-height: 1.5;
+}
+
+/* Visual Aid - share icon demo */
+.share-icon-demo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin: 0 2px;
+}
+.share-icon-demo svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Buttons */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  border-radius: 13px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: transform 0.15s, opacity 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #007AFF, #5856D6);
+  color: white;
+  margin-top: 20px;
+}
+.btn-secondary {
+  background: #F2F2F7;
+  color: #007AFF;
+  margin-top: 10px;
+}
+.btn-open {
+  background: #34C759;
+  color: white;
+  margin-top: 16px;
+  font-size: 17px;
+  padding: 16px;
+}
+
+/* Features */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  background: #F8F8FA;
+  border-radius: 10px;
+}
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.feature-item span {
+  font-size: 13px;
+  color: #3C3C43;
+}
+
+/* Already installed state */
+.installed-banner {
+  background: linear-gradient(135deg, #34C759, #30D158);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  color: white;
+  margin-bottom: 16px;
+  display: none;
+}
+.installed-banner .check-circle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  margin: 0 auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+}
+.installed-banner h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+.installed-banner p {
+  font-size: 14px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+/* Section Hide */
+.hidden { display: none !important; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 12px;
+  color: #C7C7CC;
+}
+
+/* Animated Arrow pointing down (for share button hint) */
+@keyframes bounceDown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+.bounce-arrow {
+  display: inline-block;
+  animation: bounceDown 1.5s infinite;
+}
+
+/* Non-Safari Warning */
+.browser-warning {
+  display: none;
+  background: #007AFF;
+  color: white;
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+.browser-warning h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.browser-warning p {
+  font-size: 14px;
+  opacity: 0.9;
+  line-height: 1.5;
+}
+.copy-url-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 14px;
+  font-family: inherit;
+}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="app-icon-wrap">
+    <canvas id="appIconCanvas" width="80" height="80"></canvas>
+  </div>
+  <h1>日事清</h1>
+  <p class="subtitle">智能提醒助手</p>
+</div>
+
+<div class="content">
+
+  <!-- Already Installed Banner -->
+  <div class="installed-banner" id="installedBanner">
+    <div class="check-circle">&#10003;</div>
+    <h2>已安装到主屏幕</h2>
+    <p>你正在以独立 App 模式运行</p>
+    <button class="btn" style="background:rgba(255,255,255,0.25);color:white;margin-top:16px" onclick="location.href='index.html'">
+      打开日事清
+    </button>
+  </div>
+
+  <!-- Environment Alert -->
+  <div class="alert-banner" id="envAlert"></div>
+
+  <!-- Non-Safari Warning (shown when opened in WeChat/QQ/Chrome etc.) -->
+  <div class="browser-warning" id="browserWarning">
+    <h2>请在 Safari 中打开</h2>
+    <p>当前浏览器不支持「添加到主屏幕」功能。<br>请复制链接后在 Safari 浏览器中打开。</p>
+    <button class="copy-url-btn" onclick="copyCurrentURL()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      复制链接到 Safari 打开
+    </button>
+  </div>
+
+  <!-- Status Check -->
+  <div class="status-card" id="statusCard">
+    <div class="status-item">
+      <div class="status-dot" id="statusProtocol"></div>
+      <span class="status-label">访问方式</span>
+      <span class="status-value" id="statusProtocolText">检测中...</span>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" id="statusBrowser"></div>
+      <span class="status-label">浏览器</span>
+      <span class="status-value" id="statusBrowserText">检测中...</span>
+    </div>
+    <div class="status-item">
+      <div class="status-dot" id="statusDevice"></div>
+      <span class="status-label">设备</span>
+      <span class="status-value" id="statusDeviceText">检测中...</span>
+    </div>
+  </div>
+
+  <!-- Method: iPhone + Safari (PWA) -->
+  <div class="card" id="methodSafari">
+    <div class="card-header">
+      <span class="card-badge blue">iPhone / iPad</span>
+      <span class="card-title">添加到主屏幕</span>
+    </div>
+    
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h3>先打开日事清</h3>
+        <p>点击下方按钮，在当前浏览器中打开应用页面</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h3>点击分享按钮 <span class="bounce-arrow">&#8595;</span></h3>
+        <p>点击 Safari 底部工具栏中间的 <span class="share-icon-demo"><svg viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M4 14v5a2 2 0 002 2h12a2 2 0 002-2v-5"/></svg></span> 分享图标</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h3>选择「添加到主屏幕」</h3>
+        <p>在弹出菜单中向下滑动，找到并点击「添加到主屏幕」，然后点右上角「添加」</p>
+      </div>
+    </div>
+    
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h3>完成!</h3>
+        <p>主屏幕上会出现「日事清」App 图标，点击即可像原生 App 一样全屏使用</p>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="openApp()">
+      打开日事清 &#10095;
+    </button>
+  </div>
+
+  <!-- Method: Android -->
+  <div class="card hidden" id="methodAndroid">
+    <div class="card-header">
+      <span class="card-badge green">Android</span>
+      <span class="card-title">推荐下载 APK</span>
+    </div>
+    <p style="font-size:14px;color:#8E8E93;line-height:1.6;margin-bottom:16px">
+      Android 设备推荐直接安装 APK 安装包，可获得原生通知推送和更好的体验。如果你有 APK 文件，直接传到手机安装即可。
+    </p>
+    <p style="font-size:14px;color:#8E8E93;line-height:1.6">
+      你也可以在 Chrome 中打开应用页面，点击菜单 <strong style="color:#1C1C1E">&#8942;</strong> → 选择「添加到主屏幕」或「安装应用」。
+    </p>
+    <button class="btn btn-primary" onclick="openApp()">
+      打开日事清 &#10095;
+    </button>
+  </div>
+
+  <!-- Method: Desktop -->
+  <div class="card hidden" id="methodDesktop">
+    <div class="card-header">
+      <span class="card-badge orange">电脑端</span>
+      <span class="card-title">直接使用网页版</span>
+    </div>
+    <p style="font-size:14px;color:#8E8E93;line-height:1.6;margin-bottom:12px">
+      在电脑上直接打开 index.html 即可使用完整功能。你也可以把网页收藏到浏览器书签方便下次打开。
+    </p>
+    <button class="btn btn-primary" onclick="openApp()">
+      打开日事清 &#10095;
+    </button>
+  </div>
+
+  <!-- Features -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">功能亮点</span>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#007AFF"></div>
+        <span>智能语音输入</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#34C759"></div>
+        <span>自动分类管理</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#FF9500"></div>
+        <span>准时通知提醒</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#AF52DE"></div>
+        <span>数据本地存储</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#FF2D55"></div>
+        <span>进度可视化</span>
+      </div>
+      <div class="feature-item">
+        <div class="feature-dot" style="background:#5856D6"></div>
+        <span>快速关键词搜索</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    日事清 v1.0 &middot; 所有数据仅存储在设备本地
+  </div>
+</div>
+
+<script>
+// ====== Environment Detection ======
+const ua = navigator.userAgent;
+
+const isIOS = /iPhone|iPad|iPod/.test(ua);
+const isAndroid = /Android/.test(ua);
+const isMac = /Macintosh/.test(ua) && !isIOS;
+const isDesktop = !isIOS && !isAndroid;
+
+// Safari detection (not Chrome, not Firefox, not in-app browsers)
+const isSafari = isIOS && /Safari/.test(ua) && !/CriOS|FxiOS|OPiOS|EdgiOS/.test(ua);
+// In-app browser detection (WeChat, QQ, Weibo, etc.)
+const isInAppBrowser = /MicroMessenger|QQ\/|Weibo|Instagram|FBAN|FBAV|Twitter|Line\//.test(ua);
+// Chrome on iOS
+const isChromeIOS = isIOS && /CriOS/.test(ua);
+// Already in standalone mode (added to home screen)
+const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+// Protocol
+const isFileProtocol = window.location.protocol === 'file:';
+const isHTTP = window.location.protocol === 'http:' || window.location.protocol === 'https:';
+
+// ====== Draw App Icon ======
+function drawAppIcon() {
+  const canvas = document.getElementById('appIconCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const w = 80, h = 80;
+  
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#007AFF');
+  grad.addColorStop(1, '#5856D6');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.roundRect(0, 0, w, h, 18);
+  ctx.fill();
+  
+  // Clipboard body
+  ctx.strokeStyle = 'white';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.roundRect(20, 22, 40, 46, 5);
+  ctx.stroke();
+  
+  // Clipboard clip
+  ctx.beginPath();
+  ctx.roundRect(30, 15, 20, 12, 3);
+  ctx.fillStyle = grad;
+  ctx.fill();
+  ctx.stroke();
+  
+  // Checkmark
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'white';
+  ctx.beginPath();
+  ctx.moveTo(30, 47);
+  ctx.lineTo(37, 55);
+  ctx.lineTo(52, 38);
+  ctx.stroke();
+}
+drawAppIcon();
+
+// ====== Update Status Indicators ======
+function updateStatus() {
+  const protocolDot = document.getElementById('statusProtocol');
+  const protocolText = document.getElementById('statusProtocolText');
+  const browserDot = document.getElementById('statusBrowser');
+  const browserText = document.getElementById('statusBrowserText');
+  const deviceDot = document.getElementById('statusDevice');
+  const deviceText = document.getElementById('statusDeviceText');
+  
+  // Protocol
+  if (isHTTP) {
+    protocolDot.className = 'status-dot green';
+    protocolText.textContent = window.location.protocol === 'https:' ? 'HTTPS (安全)' : 'HTTP';
+  } else if (isFileProtocol) {
+    protocolDot.className = 'status-dot yellow';
+    protocolText.textContent = '本地文件 (file://)';
+  } else {
+    protocolDot.className = 'status-dot red';
+    protocolText.textContent = window.location.protocol;
+  }
+  
+  // Browser
+  if (isStandalone) {
+    browserDot.className = 'status-dot green';
+    browserText.textContent = '独立 App 模式';
+  } else if (isInAppBrowser) {
+    browserDot.className = 'status-dot red';
+    browserText.textContent = '应用内浏览器';
+  } else if (isSafari) {
+    browserDot.className = 'status-dot green';
+    browserText.textContent = 'Safari';
+  } else if (isChromeIOS) {
+    browserDot.className = 'status-dot yellow';
+    browserText.textContent = 'Chrome (iOS)';
+  } else if (/Chrome/.test(ua) && !isIOS) {
+    browserDot.className = 'status-dot green';
+    browserText.textContent = 'Chrome';
+  } else {
+    browserDot.className = 'status-dot yellow';
+    browserText.textContent = '其他浏览器';
+  }
+  
+  // Device
+  if (isIOS) {
+    deviceDot.className = 'status-dot green';
+    deviceText.textContent = 'iPhone / iPad';
+  } else if (isAndroid) {
+    deviceDot.className = 'status-dot green';
+    deviceText.textContent = 'Android';
+  } else {
+    deviceDot.className = 'status-dot yellow';
+    deviceText.textContent = '桌面设备';
+  }
+}
+updateStatus();
+
+// ====== Show Appropriate Method Card ======
+function showMethodCards() {
+  const safari = document.getElementById('methodSafari');
+  const android = document.getElementById('methodAndroid');
+  const desktop = document.getElementById('methodDesktop');
+  const installedBanner = document.getElementById('installedBanner');
+  const envAlert = document.getElementById('envAlert');
+  const browserWarning = document.getElementById('browserWarning');
+  
+  // Already installed as PWA
+  if (isStandalone) {
+    installedBanner.style.display = 'block';
+    safari.classList.add('hidden');
+    android.classList.add('hidden');
+    desktop.classList.add('hidden');
+    document.getElementById('statusCard').style.display = 'none';
+    return;
+  }
+  
+  // iPhone / iPad
+  if (isIOS) {
+    safari.classList.remove('hidden');
+    android.classList.add('hidden');
+    desktop.classList.add('hidden');
+    
+    // In-app browser (WeChat, QQ, etc.)
+    if (isInAppBrowser) {
+      browserWarning.style.display = 'block';
+      safari.classList.add('hidden');
+    }
+    
+    // Non-Safari browser on iOS (Chrome, Firefox)
+    if (!isSafari && !isInAppBrowser) {
+      envAlert.innerHTML = '<div class="alert-title">&#9888;&#65039; 建议使用 Safari 打开</div><div class="alert-text">「添加到主屏幕」功能仅在 Safari 浏览器中可用。请在 Safari 中打开此页面。</div>';
+      envAlert.className = 'alert-banner';
+      envAlert.style.display = 'block';
+    }
+    
+    // Local file protocol
+    if (isFileProtocol) {
+      envAlert.innerHTML = '<div class="alert-title">&#9888;&#65039; 本地文件模式</div><div class="alert-text">你正在以本地文件方式查看。如需安装到主屏幕，请将文件部署到服务器（或使用局域网 HTTP 地址），然后在 Safari 中访问。<br><br>当前可以直接点击下方按钮打开应用使用。</div>';
+      envAlert.className = 'alert-banner';
+      envAlert.style.display = 'block';
+    }
+    return;
+  }
+  
+  // Android
+  if (isAndroid) {
+    safari.classList.add('hidden');
+    android.classList.remove('hidden');
+    desktop.classList.add('hidden');
+    return;
+  }
+  
+  // Desktop
+  safari.classList.add('hidden');
+  android.classList.add('hidden');
+  desktop.classList.remove('hidden');
+}
+showMethodCards();
+
+// ====== Actions ======
+function openApp() {
+  window.location.href = 'index.html';
+}
+
+function copyCurrentURL() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('链接已复制，请打开 Safari 粘贴访问');
+    }).catch(() => {
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    showToast('链接已复制，请打开 Safari 粘贴访问');
+  } catch (e) {
+    showToast('复制失败，请手动复制地址栏链接');
+  }
+  document.body.removeChild(ta);
+}
+
+// ====== Toast ======
+let toastEl = null;
+function showToast(msg) {
+  if (toastEl) toastEl.remove();
+  toastEl = document.createElement('div');
+  toastEl.textContent = msg;
+  Object.assign(toastEl.style, {
+    position: 'fixed',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    background: 'rgba(0,0,0,0.82)',
+    color: 'white',
+    padding: '14px 24px',
+    borderRadius: '14px',
+    fontSize: '15px',
+    fontWeight: '500',
+    zIndex: '9999',
+    textAlign: 'center',
+    maxWidth: '85vw',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    transition: 'opacity 0.3s',
+    opacity: '1'
+  });
+  document.body.appendChild(toastEl);
+  setTimeout(() => {
+    if (toastEl) {
+      toastEl.style.opacity = '0';
+      setTimeout(() => { if (toastEl) { toastEl.remove(); toastEl = null; } }, 300);
+    }
+  }, 2500);
+}
+</script>
+</body>
+</html>
